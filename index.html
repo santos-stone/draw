@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سانتوس ستون - سجّل بياناتك وشارك في السحب</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.3/JsBarcode.all.min.js"></script>
+<style>
+  :root{
+    --bg:#0E0E0E;
+    --card:#1A1A1A;
+    --card2:#202020;
+    --ink:#F5F3EF;
+    --muted:#9C9791;
+    --accent:#E4392C;
+    --accent-soft:rgba(228,57,44,.14);
+    --line:#2B2B2B;
+    --good:#2EA043;
+    --good-soft:rgba(46,160,67,.14);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:"Segoe UI",Tahoma,Arial,sans-serif;
+    min-height:100vh;
+    display:flex; justify-content:center;
+    padding:26px 14px 60px;
+  }
+  .app{ width:100%; max-width:460px; }
+
+  .brand{ display:flex; align-items:center; gap:10px; margin-bottom:22px; }
+  .brand .dot{ width:34px; height:34px; border-radius:50%; background:var(--accent); flex:none;
+    box-shadow:0 0 0 4px var(--accent-soft); }
+  .brand h1{ font-size:17px; margin:0; font-weight:800; letter-spacing:.3px; }
+  .brand h1 b{ color:var(--accent); }
+  .brand p{ margin:1px 0 0; font-size:11px; color:var(--muted); }
+
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:20px; margin-bottom:16px;
+  }
+  .card h2{ font-size:15px; margin:0 0 4px; }
+  .card .sub{ font-size:12px; color:var(--muted); margin:0 0 18px; line-height:1.6; }
+
+  label{ display:block; font-size:12.5px; color:var(--muted); margin-bottom:6px; font-weight:600; }
+  input[type=text], input[type=tel]{
+    width:100%; background:var(--card2); border:1px solid var(--line); color:var(--ink);
+    padding:13px 14px; border-radius:11px; font-size:15px; margin-bottom:14px; font-family:inherit;
+    direction:ltr; text-align:right;
+  }
+  input::placeholder{ color:#5f5a52; }
+  input:focus{ outline:none; border-color:var(--accent); }
+
+  .btn{
+    width:100%; padding:14px; border:none; border-radius:11px; background:var(--accent); color:#fff;
+    font-size:14.5px; font-weight:800; cursor:pointer; font-family:inherit;
+  }
+  .btn:disabled{ opacity:.5; cursor:default; }
+  .btn.secondary{ background:var(--card2); color:var(--ink); border:1px solid var(--line); margin-top:8px; }
+  .btn.whatsapp-btn{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    background:#25D366; color:#0b3d1f; text-decoration:none; margin-top:6px;
+  }
+  .btn.whatsapp-btn span{ font-size:17px; }
+  .btn.facebook-btn{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    background:#1877F2; color:#fff; text-decoration:none; margin-top:14px;
+  }
+  .btn.facebook-btn span{ font-size:17px; }
+
+  .msg{ font-size:12.5px; padding:10px 12px; border-radius:9px; margin-bottom:14px; line-height:1.6; }
+  .msg.err{ background:rgba(228,57,44,.12); color:#ff8a80; border:1px solid rgba(228,57,44,.3); }
+  .msg.ok{ background:var(--good-soft); color:#7ee08a; border:1px solid rgba(46,160,67,.3); }
+
+  .barcode-box{
+    background:#fff; border-radius:14px; padding:18px 10px 14px; text-align:center; margin-top:4px;
+  }
+  .barcode-box svg{ max-width:100%; }
+  .barcode-box .name{ font-size:16px; font-weight:800; color:#111; margin-top:8px; }
+  .detail-list{ margin-top:10px; text-align:right; display:inline-block; }
+  .detail-list .drow{ display:flex; justify-content:space-between; gap:18px; font-size:12px; padding:3px 0; color:#555; }
+  .detail-list .drow b{ color:#111; }
+  .discount-pill{
+    display:inline-block; margin-top:14px; background:var(--accent); color:#fff;
+    padding:8px 18px; border-radius:999px; font-size:13px; font-weight:800;
+  }
+  .hint{ font-size:11.5px; color:var(--muted); text-align:center; margin-top:12px; line-height:1.7; }
+
+  .hidden{ display:none !important; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="brand">
+    <div class="dot"></div>
+    <div>
+      <h1>SANTOS <b>STONE</b></h1>
+      <p>سجّل بياناتك وشارك في السحب</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 id="card-title">سجّل بياناتك وشارك في السحب</h2>
+    <p class="sub" id="card-sub">إملأ بيانات فاتورتك، وهتدخل السحب فورًا على فرصة الحصول على خصم يصل الى 20% — هتحصل على باركود دخول برقم مرجعي خاص بيك، واحتفظ بلقطة شاشة له.</p>
+
+    <div id="cust-form">
+      <label>رقم الموبايل *</label>
+      <input type="tel" id="cust-phone" placeholder="01xxxxxxxxx" maxlength="11">
+      <label>الاسم *</label>
+      <input type="text" id="cust-name" placeholder="اسمك بالكامل">
+      <label>رقم الفاتورة *</label>
+      <input type="text" id="cust-invoice-no" placeholder="مثال: 7250">
+      <label>قيمة الفاتورة (جنيه) *</label>
+      <input type="text" id="cust-invoice-value" placeholder="مثال: 5000" inputmode="decimal">
+      <div id="cust-msg"></div>
+      <button class="btn" id="cust-submit" onclick="registerCustomer()">سجّل وشارك في السحب</button>
+    </div>
+
+    <div id="cust-result" class="hidden"></div>
+  </div>
+
+</div>
+
+<script>
+const STAFF_PIN_NOTE = ""; // لا يوجد تحقق نقطة بيع في هذه النسخة
+const INVOICE_MIN = 6971;
+const INVOICE_MAX = 10000;
+
+function normalizePhone(v){
+  return (v||'').replace(/[^\d]/g,'');
+}
+function validatePhone(v){
+  return /^01[0125][0-9]{8}$/.test(v);
+}
+function codeDatePart(d){
+  const day = String(d.getDate()).padStart(2,'0');
+  const month = String(d.getMonth()+1); // no leading zero
+  const year = d.getFullYear();
+  return `${day}${month}${year}`;
+}
+function displayDate(d){
+  const day = String(d.getDate()).padStart(2,'0');
+  const month = String(d.getMonth()+1).padStart(2,'0');
+  return `${day}/${month}/${d.getFullYear()}`;
+}
+
+function setMsg(elId, text, type){
+  const el = document.getElementById(elId);
+  if(!text){ el.innerHTML=''; return; }
+  el.innerHTML = `<div class="msg ${type}">${text}</div>`;
+}
+
+function getUsedInvoices(){
+  try{
+    return JSON.parse(localStorage.getItem('ss_raffle_used_invoices') || '[]');
+  }catch(e){ return []; }
+}
+function markInvoiceUsed(invoiceNo){
+  try{
+    const used = getUsedInvoices();
+    if(!used.includes(invoiceNo)){
+      used.push(invoiceNo);
+      localStorage.setItem('ss_raffle_used_invoices', JSON.stringify(used));
+    }
+  }catch(e){}
+}
+
+function registerCustomer(){
+  const phoneRaw = document.getElementById('cust-phone').value;
+  const name = document.getElementById('cust-name').value.trim();
+  const invoiceNoRaw = document.getElementById('cust-invoice-no').value.trim();
+  const invoiceValueRaw = document.getElementById('cust-invoice-value').value.trim();
+  const phone = normalizePhone(phoneRaw);
+  setMsg('cust-msg', '', '');
+
+  if(!validatePhone(phone)){
+    setMsg('cust-msg', 'برجاء إدخال رقم موبايل مصري صحيح (11 رقم يبدأ بـ 01)', 'err');
+    return;
+  }
+  if(!name){
+    setMsg('cust-msg', 'برجاء إدخال اسم العميل', 'err');
+    return;
+  }
+  const invoiceNo = invoiceNoRaw.replace(/[^\w\-]/g,'');
+  if(!invoiceNo){
+    setMsg('cust-msg', 'برجاء إدخال رقم فاتورة صحيح (أرقام/حروف إنجليزية فقط)', 'err');
+    return;
+  }
+  const invoiceNoNum = parseInt(invoiceNo, 10);
+  if(!/^\d+$/.test(invoiceNo) || isNaN(invoiceNoNum) || invoiceNoNum < INVOICE_MIN || invoiceNoNum > INVOICE_MAX){
+    setMsg('cust-msg', 'رقم الفاتورة غير صحيح', 'err');
+    return;
+  }
+  if(getUsedInvoices().includes(invoiceNo)){
+    setMsg('cust-msg', 'رقم الفاتورة ده اتسجّل بيه قبل كده في السحب، مش ممكن يتكرر', 'err');
+    return;
+  }
+  const invoiceValue = parseFloat(invoiceValueRaw.replace(/,/g,''));
+  if(!invoiceValueRaw || isNaN(invoiceValue) || invoiceValue <= 0){
+    setMsg('cust-msg', 'برجاء إدخال قيمة فاتورة صحيحة أكبر من صفر', 'err');
+    return;
+  }
+
+  const now = new Date();
+  const stamp = codeDatePart(now);
+  const code = invoiceNo + stamp;
+  markInvoiceUsed(invoiceNo);
+  setMsg('cust-msg', 'تم تسجيلك في السحب بنجاح!', 'ok');
+  document.getElementById('cust-form').classList.add('hidden');
+  showBarcode(code, phone, name, invoiceNo, invoiceValue, now);
+}
+
+function showBarcode(code, phone, name, invoiceNo, invoiceValue, dateObj){
+  document.getElementById('card-title').textContent = 'مبروك انت على وشك تاكيد اشتراكك فى السحب';
+  document.getElementById('card-sub').textContent = 'قم باتباع الخطوات بالاسفل';
+  const box = document.getElementById('cust-result');
+  box.classList.remove('hidden');
+  box.innerHTML = `
+    <div class="barcode-box">
+      <svg id="barcode-svg"></svg>
+      <div class="name">${name}</div>
+      <div class="detail-list">
+        <div class="drow"><span>رقم الموبايل</span><b dir="ltr">${phone}</b></div>
+        <div class="drow"><span>رقم الفاتورة</span><b dir="ltr">${invoiceNo}</b></div>
+        <div class="drow"><span>قيمة الفاتورة</span><b dir="ltr">${invoiceValue.toLocaleString('en-US')} ج.م</b></div>
+        <div class="drow"><span>التاريخ</span><b dir="ltr">${displayDate(dateObj)}</b></div>
+      </div>
+      <div class="discount-pill">🎉 أنت الآن ضمن السحب على الخصم</div>
+    </div>
+    <p class="hint" style="font-size:14.5px; font-weight:600; color:var(--ink);">قم بعمل شير لصفحتنا على الفيس بوك، ثم عمل اسكرين للباركود مع الشير، وارسالهما على الواتس لتأكيد دخولك السحب.</p>
+    <a class="btn facebook-btn" href="https://www.facebook.com/share/14yYuQxn6aR/" target="_blank" rel="noopener">
+      <span>📘</span> افتح صفحة سانتوس ستون وشاركها
+    </a>
+    <a class="btn whatsapp-btn" href="https://wa.me/201000316161" target="_blank" rel="noopener">
+      <span>📲</span> إرسال
+    </a>
+  `;
+  try{
+    JsBarcode("#barcode-svg", code, {
+      format: "CODE128", displayValue: true, text: "أنت مشترك في السحب",
+      fontSize: 15, textMargin: 6, font: "'Segoe UI', Tahoma, Arial, sans-serif",
+      width: 1.7, height: 60, margin: 8, background: "#ffffff", lineColor: "#111111"
+    });
+  }catch(e){
+    document.getElementById('barcode-svg').outerHTML = '<div style="color:#900;font-size:12px;padding:10px;">تعذّر رسم شكل الباركود، لكن رقم الفاتورة '+invoiceNo+' يقدر فريقنا يستخدمه للتأكد من مشاركتك في السحب.</div>';
+  }
+}
+</script>
+</body>
+</html>
