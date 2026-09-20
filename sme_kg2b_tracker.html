@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>K.G. 2B Tracker — Saint Mary Elias</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FFFCF6;
+    --ink:#2A2620;
+    --ink-soft:#6B6459;
+    --blue:#2E7FD6;
+    --red:#E63950;
+    --gold:#F2A93B;
+    --line:#EDE6D8;
+    --card:#FFFFFF;
+    --present:#2E9E6B;
+    --absent:#E0673B;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100%;
+  }
+  h1,h2,h3,.display{font-family:'Baloo 2',sans-serif;}
+
+  header.top{
+    padding:env(safe-area-inset-top,0px) 0 0 0;
+    background:linear-gradient(180deg,#FFFFFF 0%,#FFFCF6 100%);
+    border-bottom:3px solid var(--line);
+    position:sticky;
+    top:0;
+    z-index:20;
+  }
+  .top-inner{
+    max-width:900px;
+    margin:0 auto;
+    padding:14px 18px 12px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  .top-inner img{
+    width:52px;height:52px;object-fit:contain;flex-shrink:0;
+  }
+  .top-text{flex:1;min-width:0;}
+  .top-text h1{
+    margin:0;
+    font-size:1.28rem;
+    font-weight:800;
+    letter-spacing:.2px;
+    line-height:1.15;
+    color:var(--ink);
+  }
+  .top-text p{
+    margin:2px 0 0;
+    font-size:.82rem;
+    color:var(--ink-soft);
+    font-weight:600;
+  }
+  .mode-badge{
+    flex-shrink:0;
+    font-size:.7rem;
+    font-weight:800;
+    padding:5px 10px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+  .mode-badge.edit{ background:#E6F3FF; color:var(--blue); }
+  .mode-badge.view{ background:#F1EEE6; color:var(--ink-soft); }
+
+  nav.tabs{
+    max-width:900px;
+    margin:0 auto;
+    padding:0 18px;
+    display:flex;
+    gap:6px;
+    overflow-x:auto;
+  }
+  nav.tabs button{
+    border:none;
+    background:none;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:.9rem;
+    padding:10px 4px 12px;
+    color:var(--ink-soft);
+    border-bottom:3px solid transparent;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  nav.tabs button.active{
+    color:var(--blue);
+    border-bottom-color:var(--blue);
+  }
+
+  main{
+    max-width:900px;
+    margin:0 auto;
+    padding:20px 18px 60px;
+  }
+  .view{display:none;}
+  .view.active{display:block;}
+
+  .row-controls{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:16px;
+  }
+  .row-controls label{
+    font-size:.82rem;
+    font-weight:600;
+    color:var(--ink-soft);
+  }
+  .spacer{flex:1;min-width:4px;}
+  .info-pill{
+    font-size:.78rem;
+    font-weight:700;
+    padding:7px 12px;
+    border-radius:999px;
+    background:#F1EEE6;
+    color:var(--ink);
+    white-space:nowrap;
+  }
+  .info-pill span{color:var(--ink-soft);font-weight:600;}
+  input[type=date], input[type=month]{
+    font-family:'Inter',sans-serif;
+    font-size:.95rem;
+    padding:8px 10px;
+    border:2px solid var(--line);
+    border-radius:10px;
+    background:var(--card);
+    color:var(--ink);
+  }
+  select{
+    font-family:'Inter',sans-serif;
+    font-size:.95rem;
+    padding:8px 10px;
+    border:2px solid var(--line);
+    border-radius:10px;
+    background:var(--card);
+    color:var(--ink);
+  }
+  .btn{
+    font-family:'Inter',sans-serif;
+    font-weight:700;
+    font-size:.88rem;
+    border:none;
+    border-radius:10px;
+    padding:10px 18px;
+    cursor:pointer;
+    color:#fff;
+    background:var(--blue);
+  }
+  .btn.secondary{
+    background:var(--card);
+    color:var(--ink);
+    border:2px solid var(--line);
+  }
+  .btn.small{ padding:7px 12px; font-size:.78rem; }
+  .btn:active{ transform:translateY(1px); }
+  .btn:disabled{ opacity:.5; cursor:not-allowed; }
+
+  .save-bar{
+    position:sticky;
+    bottom:0;
+    background:linear-gradient(0deg,var(--cream) 60%,rgba(255,252,246,0));
+    padding:14px 0 10px;
+    margin-top:10px;
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+  }
+
+  .readonly-note{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:#F1EEE6;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:10px 14px;
+    margin-bottom:14px;
+    font-size:.82rem;
+    color:var(--ink-soft);
+  }
+  .dirty-note{
+    display:none;
+    align-items:center;
+    gap:10px;
+    background:#FFF6E0;
+    border:1px solid var(--gold);
+    border-radius:12px;
+    padding:10px 14px;
+    margin-bottom:14px;
+    font-size:.82rem;
+    color:var(--ink);
+    font-weight:600;
+  }
+  .dirty-note.show{display:flex;}
+
+  /* ---- Daily record: stacked student cards (mobile-safe, no horizontal scroll needed) ---- */
+  #daily-list{ display:flex; flex-direction:column; gap:10px; }
+  .student-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:12px 14px;
+  }
+  .student-card-head{
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+    margin-bottom:10px;
+  }
+  .student-card-head .idx{
+    color:var(--ink-soft);
+    font-size:.78rem;
+    font-weight:700;
+    flex-shrink:0;
+  }
+  .student-card-head .name-cell{
+    font-weight:700;
+    font-size:.95rem;
+    line-height:1.25;
+  }
+  .field-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:7px 0;
+    border-top:1px solid var(--line);
+  }
+  .field-row .field-label{
+    font-size:.78rem;
+    font-weight:600;
+    color:var(--ink-soft);
+    flex-shrink:0;
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    overflow:hidden;
+  }
+  .table-scroll{
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:.88rem;
+  }
+  thead th{
+    text-align:left;
+    font-size:.72rem;
+    font-weight:700;
+    color:var(--ink-soft);
+    padding:10px 12px;
+    background:#FBF7EE;
+    border-bottom:2px solid var(--line);
+    white-space:nowrap;
+  }
+  tbody td{
+    padding:10px 12px;
+    border-bottom:1px solid var(--line);
+    vertical-align:middle;
+    white-space:nowrap;
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  .name-cell{font-weight:600;font-size:.88rem;white-space:normal;}
+  .idx{color:var(--ink-soft);font-size:.78rem;width:22px;}
+
+  .toggle-group{display:flex;gap:6px;flex-shrink:0;}
+  .toggle{
+    border:2px solid var(--line);
+    background:#fff;
+    border-radius:8px;
+    padding:7px 12px;
+    font-size:.8rem;
+    font-weight:700;
+    cursor:pointer;
+    color:var(--ink-soft);
+    white-space:nowrap;
+  }
+  .toggle.on-present{ background:var(--present); border-color:var(--present); color:#fff;}
+  .toggle.on-absent{ background:var(--absent); border-color:var(--absent); color:#fff;}
+  .toggle.on-hw{ background:var(--gold); border-color:var(--gold); color:#fff;}
+  body.readonly .toggle{ cursor:default; opacity:.85; }
+
+  input.score{
+    width:70px;
+    padding:7px 8px;
+    border:2px solid var(--line);
+    border-radius:8px;
+    font-family:'Inter',sans-serif;
+    font-size:.9rem;
+    text-align:center;
+    flex-shrink:0;
+  }
+  input.score:disabled{ background:#F6F3EC; color:var(--ink-soft); }
+
+  .star-banner{
+    background:linear-gradient(120deg,#FFF6E0,#FFFDF6);
+    border:2px solid var(--gold);
+    border-radius:16px;
+    padding:16px 18px;
+    margin-bottom:18px;
+    display:flex;
+    gap:14px;
+    align-items:center;
+  }
+  .star-banner .emoji{font-size:2.1rem;}
+  .star-banner h3{margin:0 0 3px;font-size:1.05rem;}
+  .star-banner p{margin:0;font-size:.85rem;color:var(--ink-soft);}
+  .star-banner .names{color:var(--ink);font-weight:700;}
+
+  .cat-cards{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .cat-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:12px;
+    text-align:center;
+  }
+  .cat-card .label{font-size:.68rem;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.4px;}
+  .cat-card .who{font-size:.92rem;font-weight:700;margin-top:6px;color:var(--ink);}
+  .cat-card .pct{font-size:.78rem;color:var(--ink-soft);margin-top:2px;}
+
+  .rank-badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:22px;height:22px;
+    border-radius:50%;
+    font-size:.72rem;
+    font-weight:800;
+    background:var(--line);
+    color:var(--ink-soft);
+  }
+  .rank-badge.gold{background:var(--gold);color:#fff;}
+
+  .pct-bar-wrap{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    min-width:120px;
+  }
+  .pct-bar-bg{
+    flex:1;
+    height:7px;
+    border-radius:6px;
+    background:var(--line);
+    overflow:hidden;
+    min-width:50px;
+  }
+  .pct-bar-fill{
+    height:100%;
+    border-radius:6px;
+    background:var(--blue);
+  }
+  .pct-num{font-size:.78rem;font-weight:700;width:48px;text-align:right;flex-shrink:0;}
+
+  .empty{
+    text-align:center;
+    padding:40px 20px;
+    color:var(--ink-soft);
+    font-size:.9rem;
+  }
+
+  .section-title{
+    font-size:1rem;
+    font-weight:700;
+    margin:26px 0 10px;
+  }
+  .daylog-card{ margin-bottom:12px; }
+  .daylog-date{
+    font-size:.82rem;
+    font-weight:700;
+    padding:10px 14px;
+    background:#FBF7EE;
+    border-bottom:2px solid var(--line);
+  }
+
+  .footer-actions{
+    margin-top:24px;
+    display:flex;
+    justify-content:center;
+  }
+  .footer-actions button{
+    background:none;
+    border:none;
+    color:var(--ink-soft);
+    font-size:.78rem;
+    text-decoration:underline;
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+  }
+
+  .toast{
+    position:fixed;
+    bottom:calc(24px + env(safe-area-inset-bottom,0px));
+    left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--ink);
+    color:#fff;
+    padding:10px 18px;
+    border-radius:10px;
+    font-size:.85rem;
+    font-weight:600;
+    opacity:0;
+    transition:all .25s ease;
+    pointer-events:none;
+    z-index:50;
+    max-width:88vw;
+    text-align:center;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  ::-webkit-scrollbar{height:6px;width:6px;}
+
+  @media (max-width:520px){
+    .cat-cards{grid-template-columns:1fr;}
+    thead th, tbody td{padding:8px 8px;}
+  }
+
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --cream:#1B1912;
+      --ink:#F3EFE4;
+      --ink-soft:#B4AC9C;
+      --line:#3A3527;
+      --card:#252217;
+    }
+    body{background:var(--cream);}
+    header.top{background:linear-gradient(180deg,#211E15 0%,#1B1912 100%);}
+    thead th, .daylog-date{background:#211E15;}
+    input[type=date], input[type=month], input.score, select{background:#211E15;color:var(--ink);}
+    .toggle{background:#211E15;}
+    .star-banner{background:linear-gradient(120deg,#2A2410,#1F1C13);}
+    .info-pill, .readonly-note{background:#211E15;}
+  }
+  :root[data-theme="dark"]{
+    --cream:#1B1912;
+    --ink:#F3EFE4;
+    --ink-soft:#B4AC9C;
+    --line:#3A3527;
+    --card:#252217;
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <img src="data:image/png;base64,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" alt="Saint Mary Elias logo">
+    <div class="top-text">
+      <h1>Saint Mary Elias Language School</h1>
+      <p>K.G. 2 B &middot; 2026/2027 &middot; Daily Tracker</p>
+    </div>
+    <div class="mode-badge" id="mode-badge">Loading…</div>
+  </div>
+  <nav class="tabs">
+    <button class="tab-btn active" data-view="daily">Daily Record</button>
+    <button class="tab-btn" data-view="report">Monthly Report</button>
+    <button class="tab-btn" data-view="history">Student History</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- DAILY RECORD VIEW -->
+  <section id="view-daily" class="view active">
+    <div id="readonly-note-daily" class="readonly-note" style="display:none;">
+      This is a read-only view. You can look up any date but nothing can be changed here.
+    </div>
+    <div id="dirty-note" class="dirty-note">
+      You have unsaved changes on this day — tap "Save day" below to keep them.
+    </div>
+    <div class="row-controls">
+      <label for="daily-date">Date</label>
+      <input type="date" id="daily-date">
+      <button class="btn secondary" id="copy-yesterday" title="Copy attendance & homework from the previous recorded day">Copy previous day</button>
+    </div>
+    <div class="row-controls">
+      <div class="info-pill"><span>Teacher:</span> <span id="teacher-name-pill">Marina Mohsen</span></div>
+      <div class="info-pill"><span>Subject:</span> <span id="subject-name-pill">Math</span></div>
+    </div>
+
+    <div id="daily-list"></div>
+
+    <div class="save-bar" id="save-bar">
+      <button class="btn secondary" id="clear-day">Clear this day</button>
+      <button class="btn" id="save-day">Save day</button>
+    </div>
+  </section>
+
+  <!-- MONTHLY REPORT VIEW -->
+  <section id="view-report" class="view">
+    <div class="row-controls">
+      <label for="report-month">Month</label>
+      <input type="month" id="report-month">
+      <button class="btn secondary small" id="download-report-pdf" style="display:none;">Share report (image)</button>
+    </div>
+
+    <div id="report-content"></div>
+    <div id="report-daylog"></div>
+  </section>
+
+  <!-- STUDENT HISTORY VIEW -->
+  <section id="view-history" class="view">
+    <div class="row-controls">
+      <label for="history-select">Student</label>
+      <select id="history-select"></select>
+    </div>
+    <div class="row-controls">
+      <label for="history-month">Month (optional)</label>
+      <input type="month" id="history-month">
+      <button class="btn secondary small" id="history-month-clear">Show all-time</button>
+    </div>
+    <div id="history-content"></div>
+    <div class="section-title" id="history-ranking-title" style="display:none;">Class ranking for this month</div>
+    <div id="history-ranking-content"></div>
+  </section>
+
+  <div class="footer-actions" id="footer-actions">
+    <button id="reset-all">Erase all saved data</button>
+  </div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ STATIC ROSTER & SETTINGS ============ */
+const GIRLS = [
+  "Ayla Sameh Mohamed Selim Abdullah",
+  "Cindrella Mahmoud Helmy Mohammed Makram Allah",
+  "Elaria Mina Galal Lotfy",
+  "Farida Ahmed Samir Sobhy Abd El Nour",
+  "Farida Essam Kamal Mukhtar",
+  "Farida Karim Hussein Rashad",
+  "Gamila Hatem Hassan Hussein Mohamed",
+  "Hoor Hisham Mohammed Elsayed Mostafa Mohammed",
+  "Jouri Ayman Mohamed Ibrahim Ezz Eldin",
+  "Karma Farag Mohamed Farag",
+  "Karma Mohamed Abd El Aal",
+  "Lavinia Stevan Moures Stefanose",
+  "Lelia Sayed Ahmed Saeed",
+  "Mariam Ahmed Mohamed Galal",
+  "Mayven Michael Nasry Zaki Sous",
+  "Merola Basiluos Gerges Ibrahim",
+  "Nelly Karem Mohamed Mosaad",
+  "Perla Mahmoud Reda Abdel Moneim Mohamed Alloush",
+  "Reman Mohamed Ahmed Saad Zaghloul Ahmed",
+  "Sedra Hiytham Abdelhamed Ahmed Hediwy",
+  "Sophie Ahmed Saif Elnasr Mohamed"
+];
+
+const EXAM_MAX = 20;
+
+const SETTINGS = { teacher: "Marina Mohsen", subject: "Math" };
+document.getElementById('teacher-name-pill').textContent = SETTINGS.teacher;
+document.getElementById('subject-name-pill').textContent = SETTINGS.subject;
+
+const LOCAL_KEY = "sme_kg2b_tracker_v4";
+const DB_DOC_PATH = "sme_kg2b_state/main";
+
+let DATA = { records: {} };
+let dbApi = null, userApi = null, dbDocRef = null, downloadsApi = null;
+let canEdit = true; /* becomes false only when the platform confirms this viewer is read-only */
+let platformMode = false; /* true once we know we're running with live shared storage */
+let dailyDirty = false; /* true while the currently-shown day has unsaved edits */
+
+/* ============ LOCAL FALLBACK / BASELINE STORAGE ============ */
+/* localStorage is always kept as the source of truth on this device, so a
+   flaky or slow shared-sync layer can never make the teacher lose what she
+   just typed. Anything coming from the shared store is merged in on top,
+   never used to blindly replace what's already here. */
+function loadLocal(){
+  try{
+    const raw = localStorage.getItem(LOCAL_KEY);
+    if(!raw) return { records:{} };
+    const parsed = JSON.parse(raw);
+    if(!parsed.records) parsed.records = {};
+    return parsed;
+  }catch(e){ console.error("Local load failed", e); return { records:{} }; }
+}
+function saveLocal(data){
+  try{ localStorage.setItem(LOCAL_KEY, JSON.stringify(data)); return true; }
+  catch(e){ console.error("Local save failed", e); return false; }
+}
+
+function dayHasContent(dayObj){
+  if(!dayObj || !dayObj.girls) return false;
+  return Object.values(dayObj.girls).some(g => g && (g.attendance || g.homework || (g.exam!==null && g.exam!==undefined)));
+}
+function countFilledFields(dayObj){
+  if(!dayObj || !dayObj.girls) return 0;
+  return Object.values(dayObj.girls).reduce((n,g)=>{
+    if(!g) return n;
+    return n + (g.attendance?1:0) + (g.homework?1:0) + (g.exam!==null && g.exam!==undefined ? 1:0);
+  },0);
+}
+/* Merge remote records into local ones per-date, keeping whichever version
+   of a given day is more complete instead of ever wiping local data. */
+function mergeRecordsInto(localRecords, incomingRecords){
+  if(!incomingRecords) return localRecords;
+  Object.keys(incomingRecords).forEach(date=>{
+    const incomingDay = incomingRecords[date];
+    const localDay = localRecords[date];
+    if(!dayHasContent(incomingDay)) return; // nothing useful to bring in
+    if(!localDay || countFilledFields(incomingDay) > countFilledFields(localDay)){
+      localRecords[date] = incomingDay;
+    }
+  });
+  return localRecords;
+}
+
+/* ============ PLATFORM (SHARED, LIVE) STORAGE ============ */
+async function initPlatform(){
+  DATA = loadLocal();
+
+  try{
+    if(window.claude && typeof window.claude.use === 'function'){
+      userApi = await window.claude.use("user").catch(()=>null);
+      dbApi = await window.claude.use("db").catch(()=>null);
+      downloadsApi = await window.claude.use("downloads").catch(()=>null);
+    }
+  }catch(e){ console.error("Platform init failed", e); }
+
+  if(userApi){
+    try{ canEdit = !!userApi.canEdit(); }catch(e){ canEdit = false; }
+  }
+
+  if(dbApi){
+    platformMode = true;
+    try{
+      dbDocRef = dbApi.doc(DB_DOC_PATH);
+      dbDocRef.onSnapshot((snap)=>{
+        try{
+          let d = null;
+          if(snap && typeof snap.data === 'function') d = snap.data();
+          else if(snap && snap.data && typeof snap.data === 'object') d = snap.data;
+          else if(snap && snap.records) d = snap;
+
+          if(d && d.records && Object.keys(d.records).length){
+            mergeRecordsInto(DATA.records, d.records);
+            saveLocal(DATA);
+          } else if(canEdit && Object.keys(DATA.records).length === 0){
+            dbDocRef.set({ records: {} }).catch(e=>console.error("init doc failed", e));
+          } else if(canEdit && Object.keys(DATA.records).length > 0){
+            /* the shared doc is empty but we already have local records
+               (e.g. it was never successfully written before) — push ours up */
+            dbDocRef.set({ records: DATA.records }).catch(e=>console.error("resync failed", e));
+          }
+        }catch(e){ console.error("Snapshot parse failed", e); }
+        if(!dailyDirty) refreshAllViews();
+      });
+    }catch(e){
+      console.error("db.doc/onSnapshot failed", e);
+      dbApi = null; platformMode = false;
+    }
+  }
+
+  applyEditMode();
+  const pdfBtn = document.getElementById('download-report-pdf');
+  if(pdfBtn) pdfBtn.style.display = downloadsApi ? 'inline-block' : 'none';
+  refreshAllViews();
+}
+
+async function persist(){
+  saveLocal(DATA);
+  if(dbApi && dbDocRef){
+    try{
+      await dbDocRef.set({ records: DATA.records });
+      return true;
+    }catch(e){
+      console.error("Shared save failed (kept safely on this device)", e);
+      return true; /* local save above already succeeded */
+    }
+  }
+  return true;
+}
+
+function applyEditMode(){
+  const badge = document.getElementById('mode-badge');
+  const saveBar = document.getElementById('save-bar');
+  const readonlyNote = document.getElementById('readonly-note-daily');
+  const footer = document.getElementById('footer-actions');
+  const copyBtn = document.getElementById('copy-yesterday');
+
+  if(canEdit){
+    badge.textContent = platformMode ? 'Teacher view' : 'Editing';
+    badge.className = 'mode-badge edit';
+    saveBar.style.display = 'flex';
+    readonlyNote.style.display = 'none';
+    footer.style.display = 'flex';
+    copyBtn.style.display = 'inline-block';
+  } else {
+    badge.textContent = 'View only';
+    badge.className = 'mode-badge view';
+    saveBar.style.display = 'none';
+    readonlyNote.style.display = 'flex';
+    footer.style.display = 'none';
+    copyBtn.style.display = 'none';
+    document.body.classList.add('readonly');
+  }
+}
+
+function refreshAllViews(){
+  if(!dailyDirty){
+    buildDailyRows(dailyDateInput.value || todayStr());
+  }
+  if(document.getElementById('view-report').classList.contains('active')) renderReport();
+  if(document.getElementById('view-history').classList.contains('active')) renderHistory();
+}
+
+function todayStr(){
+  const d = new Date();
+  const off = d.getTimezoneOffset();
+  const local = new Date(d.getTime() - off*60000);
+  return local.toISOString().slice(0,10);
+}
+
+function formatDatePretty(dateStr){
+  const [y,m,d] = dateStr.split('-').map(Number);
+  const dt = new Date(y, m-1, d);
+  return dt.toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+function setDirty(val){
+  dailyDirty = val;
+  document.getElementById('dirty-note').classList.toggle('show', val && canEdit);
+}
+
+/* ---------- TAB SWITCHING ---------- */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('view-'+btn.dataset.view).classList.add('active');
+    if(btn.dataset.view === 'report') renderReport();
+    if(btn.dataset.view === 'history') renderHistory();
+  });
+});
+
+/* ---------- DAILY RECORD VIEW (stacked cards, mobile-safe) ---------- */
+const dailyDateInput = document.getElementById('daily-date');
+const dailyList = document.getElementById('daily-list');
+
+function buildDailyRows(dateStr){
+  const dayRecord = (DATA.records[dateStr] && DATA.records[dateStr].girls) || {};
+  dailyList.innerHTML = '';
+  GIRLS.forEach((name, i)=>{
+    const g = dayRecord[name] || {attendance:null, homework:null, exam:null};
+    const card = document.createElement('div');
+    card.className = 'student-card';
+    card.dataset.name = name;
+    card.innerHTML = `
+      <div class="student-card-head">
+        <span class="idx">${i+1}</span>
+        <span class="name-cell">${name}</span>
+      </div>
+      <div class="field-row">
+        <span class="field-label">Attendance</span>
+        <div class="toggle-group" data-field="attendance">
+          <button type="button" class="toggle att-present ${g.attendance==='present'?'on-present':''}" data-val="present">Present</button>
+          <button type="button" class="toggle att-absent ${g.attendance==='absent'?'on-absent':''}" data-val="absent">Absent</button>
+        </div>
+      </div>
+      <div class="field-row">
+        <span class="field-label">Homework</span>
+        <div class="toggle-group" data-field="homework">
+          <button type="button" class="toggle hw-done ${g.homework==='done'?'on-hw':''}" data-val="done">Done</button>
+          <button type="button" class="toggle hw-not ${g.homework==='not_done'?'on-absent':''}" data-val="not_done">Not done</button>
+        </div>
+      </div>
+      <div class="field-row">
+        <span class="field-label">Exam (out of ${EXAM_MAX})</span>
+        <input type="number" min="0" max="${EXAM_MAX}" step="0.5" class="score" placeholder="—/${EXAM_MAX}" value="${g.exam!==null && g.exam!==undefined ? g.exam : ''}">
+      </div>
+    `;
+    dailyList.appendChild(card);
+  });
+
+  dailyList.querySelectorAll('.toggle-group').forEach(group=>{
+    group.querySelectorAll('.toggle').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        if(!canEdit) return;
+        const field = group.dataset.field;
+        const val = btn.dataset.val;
+        const isOn = field==='attendance'
+          ? btn.classList.contains('on-present') || btn.classList.contains('on-absent')
+          : btn.classList.contains('on-hw') || btn.classList.contains('on-absent');
+        group.querySelectorAll('.toggle').forEach(b=>{
+          b.classList.remove('on-present','on-absent','on-hw');
+        });
+        if(!isOn){
+          if(field==='attendance'){
+            btn.classList.add(val==='present' ? 'on-present' : 'on-absent');
+          } else {
+            btn.classList.add(val==='done' ? 'on-hw' : 'on-absent');
+          }
+          group.dataset.selected = val;
+        } else {
+          group.dataset.selected = '';
+        }
+        setDirty(true);
+      });
+    });
+    const activeBtn = group.querySelector('.on-present,.on-absent,.on-hw');
+    group.dataset.selected = activeBtn ? activeBtn.dataset.val : '';
+  });
+
+  dailyList.querySelectorAll('.score').forEach(inp=>{
+    if(!canEdit){
+      inp.disabled = true;
+    } else {
+      inp.addEventListener('input', ()=> setDirty(true));
+    }
+  });
+}
+
+function collectDailyRows(){
+  const girls = {};
+  dailyList.querySelectorAll('.student-card').forEach(card=>{
+    const name = card.dataset.name;
+    const attGroup = card.querySelector('[data-field="attendance"]');
+    const hwGroup = card.querySelector('[data-field="homework"]');
+    const scoreInput = card.querySelector('.score');
+    const attVal = attGroup.dataset.selected || null;
+    const hwVal = hwGroup.dataset.selected || null;
+    let examVal = scoreInput.value === '' ? null : Number(scoreInput.value);
+    if(examVal !== null){
+      if(examVal > EXAM_MAX) examVal = EXAM_MAX;
+      if(examVal < 0) examVal = 0;
+    }
+    girls[name] = { attendance: attVal, homework: hwVal, exam: examVal };
+  });
+  return girls;
+}
+
+function nextDateStr(dateStr){
+  const [y,m,d] = dateStr.split('-').map(Number);
+  const dt = new Date(y, m-1, d);
+  dt.setDate(dt.getDate()+1);
+  const yy = dt.getFullYear();
+  const mm = String(dt.getMonth()+1).padStart(2,'0');
+  const dd = String(dt.getDate()).padStart(2,'0');
+  return `${yy}-${mm}-${dd}`;
+}
+
+document.getElementById('save-day').addEventListener('click', async ()=>{
+  if(!canEdit) return;
+  const dateStr = dailyDateInput.value || todayStr();
+  DATA.records[dateStr] = { girls: collectDailyRows() };
+  setDirty(false);
+  await persist();
+  if(document.getElementById('view-report').classList.contains('active')) renderReport();
+  if(document.getElementById('view-history').classList.contains('active')) renderHistory();
+
+  const nextDate = nextDateStr(dateStr);
+  dailyDateInput.value = nextDate;
+  buildDailyRows(nextDate);
+  showToast('Day saved — moved on to ' + nextDate);
+});
+
+document.getElementById('clear-day').addEventListener('click', async ()=>{
+  if(!canEdit) return;
+  const dateStr = dailyDateInput.value || todayStr();
+  if(!confirm('Clear all entries for this day?')) return;
+  delete DATA.records[dateStr];
+  setDirty(false);
+  await persist();
+  buildDailyRows(dateStr);
+  showToast('Day cleared');
+});
+
+document.getElementById('copy-yesterday').addEventListener('click', ()=>{
+  if(!canEdit) return;
+  const dateStr = dailyDateInput.value || todayStr();
+  const priorDates = Object.keys(DATA.records).filter(d=>d < dateStr).sort();
+  if(priorDates.length === 0){ showToast('No earlier day found'); return; }
+  const prior = priorDates[priorDates.length-1];
+  const priorGirls = DATA.records[prior].girls || {};
+  const copied = {};
+  GIRLS.forEach(name=>{
+    const g = priorGirls[name] || {};
+    copied[name] = { attendance: g.attendance || null, homework: g.homework || null, exam: null };
+  });
+  DATA.records[dateStr] = { girls: copied };
+  buildDailyRows(dateStr);
+  setDirty(true);
+  showToast('Copied — tap "Save day" to keep it');
+});
+
+dailyDateInput.addEventListener('change', ()=>{
+  setDirty(false);
+  buildDailyRows(dailyDateInput.value || todayStr());
+});
+
+/* ---------- STATS ENGINE ---------- */
+function getMonthDates(monthStr){
+  return Object.keys(DATA.records).filter(d => d.startsWith(monthStr)).sort();
+}
+
+function computeStatsForGirl(name, dateList){
+  let daysPresent=0, daysAbsent=0, hwDone=0, hwNot=0, examSum=0, examCount=0, daysRecorded=0;
+  dateList.forEach(d=>{
+    const rec = DATA.records[d] && DATA.records[d].girls && DATA.records[d].girls[name];
+    if(!rec) return;
+    let touched=false;
+    if(rec.attendance==='present'){daysPresent++; touched=true;}
+    if(rec.attendance==='absent'){daysAbsent++; touched=true;}
+    if(rec.homework==='done'){hwDone++; touched=true;}
+    if(rec.homework==='not_done'){hwNot++; touched=true;}
+    if(rec.exam!==null && rec.exam!==undefined && !isNaN(rec.exam)){examSum+=rec.exam; examCount++; touched=true;}
+    if(touched) daysRecorded++;
+  });
+  const attTotal = daysPresent+daysAbsent;
+  const hwTotal = hwDone+hwNot;
+  const examAvg = examCount>0 ? Math.round((examSum/examCount)*10)/10 : null;
+  return {
+    name,
+    attendancePct: attTotal>0 ? Math.round((daysPresent/attTotal)*1000)/10 : null,
+    homeworkPct: hwTotal>0 ? Math.round((hwDone/hwTotal)*1000)/10 : null,
+    examAvg,
+    examPct: examAvg!==null ? Math.round((examAvg/EXAM_MAX)*1000)/10 : null,
+    daysPresent, attTotal, hwDone, hwTotal, examCount,
+    daysRecorded
+  };
+}
+
+function overallScore(s){
+  const parts = [s.attendancePct, s.homeworkPct, s.examPct].filter(v=>v!==null);
+  if(parts.length===0) return null;
+  return Math.round((parts.reduce((a,b)=>a+b,0)/parts.length)*10)/10;
+}
+
+/* Ranked class list for a given list of dates (used by both Monthly Report
+   and the month filter inside Student History) */
+function computeClassRanking(dateList){
+  const stats = GIRLS.map(name=>{
+    const s = computeStatsForGirl(name, dateList);
+    s.overall = overallScore(s);
+    return s;
+  });
+  return stats.sort((a,b)=>{
+    if(a.overall===null && b.overall===null) return a.name.localeCompare(b.name);
+    if(a.overall===null) return 1;
+    if(b.overall===null) return -1;
+    return b.overall - a.overall;
+  });
+}
+
+function pctBar(pctForWidth, labelText){
+  if(pctForWidth===null) return '<span style="color:var(--ink-soft);font-size:.8rem;">no data</span>';
+  return `<div class="pct-bar-wrap"><div class="pct-bar-bg"><div class="pct-bar-fill" style="width:${pctForWidth}%;"></div></div><div class="pct-num">${labelText}</div></div>`;
+}
+
+function rankingTableHtml(sorted, maxOverall){
+  let html = `<div class="card"><div class="table-scroll"><table>
+    <thead><tr>
+      <th>#</th><th>Name</th><th>Attendance</th><th>Homework</th><th>Exam avg</th><th>Overall</th>
+    </tr></thead>
+    <tbody>`;
+  sorted.forEach((s,i)=>{
+    const isTop = maxOverall!==null && s.overall===maxOverall;
+    html += `<tr>
+      <td><span class="rank-badge ${isTop?'gold':''}">${isTop?'★':i+1}</span></td>
+      <td class="name-cell">${s.name}</td>
+      <td>${pctBar(s.attendancePct, s.attendancePct!==null ? s.attendancePct+'%' : '')}</td>
+      <td>${pctBar(s.homeworkPct, s.homeworkPct!==null ? s.homeworkPct+'%' : '')}</td>
+      <td>${pctBar(s.examPct, s.examAvg!==null ? s.examAvg+'/'+EXAM_MAX : '')}</td>
+      <td><strong>${s.overall!==null ? s.overall+'%' : '—'}</strong></td>
+    </tr>`;
+  });
+  html += `</tbody></table></div></div>`;
+  return html;
+}
+
+/* Day-by-day log: for each date in the list, show every girl who has an
+   entry that day. A girl with no exam entry that day simply shows "—",
+   meaning there was no exam. */
+function dayLogHtml(dateList){
+  const datesDesc = [...dateList].sort().reverse();
+  let html = `<div class="section-title">Day-by-day log</div>`;
+  datesDesc.forEach(d=>{
+    const girlsRec = (DATA.records[d] && DATA.records[d].girls) || {};
+    const entries = GIRLS
+      .map(name => ({name, rec: girlsRec[name]}))
+      .filter(x => x.rec && (x.rec.attendance || x.rec.homework || (x.rec.exam!==null && x.rec.exam!==undefined)));
+    if(entries.length===0) return;
+    html += `<div class="card daylog-card">
+      <div class="daylog-date">${formatDatePretty(d)}</div>
+      <div class="table-scroll"><table><thead><tr><th>Name</th><th>Attendance</th><th>Homework</th><th>Exam</th></tr></thead><tbody>`;
+    entries.forEach(({name, rec})=>{
+      html += `<tr>
+        <td class="name-cell">${name}</td>
+        <td>${rec.attendance==='present'?'Present':rec.attendance==='absent'?'Absent':'—'}</td>
+        <td>${rec.homework==='done'?'Done':rec.homework==='not_done'?'Not done':'—'}</td>
+        <td>${rec.exam!==null && rec.exam!==undefined ? rec.exam+'/'+EXAM_MAX : '— (no exam)'}</td>
+      </tr>`;
+    });
+    html += `</tbody></table></div></div>`;
+  });
+  return html;
+}
+
+/* ---------- MONTHLY REPORT VIEW ---------- */
+const reportMonthInput = document.getElementById('report-month');
+const reportContent = document.getElementById('report-content');
+const reportDaylog = document.getElementById('report-daylog');
+
+function renderReport(){
+  const monthStr = reportMonthInput.value;
+  if(!monthStr){ reportContent.innerHTML = '<div class="empty">Choose a month to see the report.</div>'; reportDaylog.innerHTML=''; return; }
+  const dateList = getMonthDates(monthStr);
+  if(dateList.length===0){ reportContent.innerHTML = '<div class="empty">No records saved yet for this month.</div>'; reportDaylog.innerHTML=''; return; }
+
+  const sorted = computeClassRanking(dateList);
+  const withOverall = sorted.filter(s=>s.overall!==null);
+  const maxOverall = withOverall.length ? Math.max(...withOverall.map(s=>s.overall)) : null;
+  const stars = maxOverall!==null ? withOverall.filter(s=>s.overall===maxOverall) : [];
+
+  function topOfCategory(field){
+    const withVal = sorted.filter(s=>s[field]!==null);
+    if(withVal.length===0) return null;
+    const max = Math.max(...withVal.map(s=>s[field]));
+    return { max, names: withVal.filter(s=>s[field]===max).map(s=>s.name) };
+  }
+  const topAtt = topOfCategory('attendancePct');
+  const topHw = topOfCategory('homeworkPct');
+  const topExam = topOfCategory('examAvg');
+
+  let html = '';
+  if(stars.length){
+    html += `<div class="star-banner">
+      <div class="emoji">⭐</div>
+      <div>
+        <h3>Star${stars.length>1?'s':''} of the month</h3>
+        <p><span class="names">${stars.map(s=>s.name).join(', ')}</span> — ${maxOverall}% overall</p>
+      </div>
+    </div>`;
+  }
+  html += `<div class="cat-cards">
+    <div class="cat-card">
+      <div class="label">Best attendance</div>
+      <div class="who">${topAtt ? topAtt.names.join(', ') : '—'}</div>
+      <div class="pct">${topAtt ? topAtt.max+'%' : 'no data'}</div>
+    </div>
+    <div class="cat-card">
+      <div class="label">Best homework</div>
+      <div class="who">${topHw ? topHw.names.join(', ') : '—'}</div>
+      <div class="pct">${topHw ? topHw.max+'%' : 'no data'}</div>
+    </div>
+    <div class="cat-card">
+      <div class="label">Best exam average</div>
+      <div class="who">${topExam ? topExam.names.join(', ') : '—'}</div>
+      <div class="pct">${topExam ? topExam.max+'/'+EXAM_MAX : 'no data'}</div>
+    </div>
+  </div>`;
+  html += rankingTableHtml(sorted, maxOverall);
+  reportContent.innerHTML = html;
+  reportDaylog.innerHTML = dayLogHtml(dateList);
+}
+
+reportMonthInput.addEventListener('change', renderReport);
+
+/* ---------- STUDENT HISTORY VIEW ---------- */
+const historySelect = document.getElementById('history-select');
+const historyMonthInput = document.getElementById('history-month');
+const historyContent = document.getElementById('history-content');
+const historyRankingTitle = document.getElementById('history-ranking-title');
+const historyRankingContent = document.getElementById('history-ranking-content');
+
+GIRLS.forEach(name=>{
+  const opt = document.createElement('option');
+  opt.value = name; opt.textContent = name;
+  historySelect.appendChild(opt);
+});
+
+document.getElementById('history-month-clear').addEventListener('click', ()=>{
+  historyMonthInput.value = '';
+  renderHistory();
+});
+
+function renderHistory(){
+  const name = historySelect.value || GIRLS[0];
+  const monthFilter = historyMonthInput.value;
+  const allDates = Object.keys(DATA.records).sort();
+  const scopedDates = monthFilter ? allDates.filter(d=>d.startsWith(monthFilter)) : allDates;
+
+  const rows = scopedDates.map(d=>{
+    const rec = DATA.records[d].girls && DATA.records[d].girls[name];
+    return {date:d, rec};
+  }).filter(r=>r.rec && (r.rec.attendance || r.rec.homework || (r.rec.exam!==null && r.rec.exam!==undefined)));
+
+  if(rows.length===0){
+    historyContent.innerHTML = `<div class="empty">${monthFilter ? 'No records for this student in this month.' : 'No records yet for this student.'}</div>`;
+  } else {
+    const allStats = computeStatsForGirl(name, scopedDates);
+    allStats.overall = overallScore(allStats);
+    let html = `<div class="cat-cards">
+      <div class="cat-card"><div class="label">Attendance</div><div class="who">${allStats.attendancePct!==null?allStats.attendancePct+'%':'—'}</div></div>
+      <div class="cat-card"><div class="label">Homework</div><div class="who">${allStats.homeworkPct!==null?allStats.homeworkPct+'%':'—'}</div></div>
+      <div class="cat-card"><div class="label">Exam average</div><div class="who">${allStats.examAvg!==null?allStats.examAvg+'/'+EXAM_MAX:'—'}</div></div>
+    </div>`;
+    html += `<div class="card"><div class="table-scroll"><table><thead><tr><th>Date</th><th>Attendance</th><th>Homework</th><th>Exam</th></tr></thead><tbody>`;
+    rows.slice().reverse().forEach(r=>{
+      html += `<tr>
+        <td>${r.date}</td>
+        <td>${r.rec.attendance==='present'?'Present':r.rec.attendance==='absent'?'Absent':'—'}</td>
+        <td>${r.rec.homework==='done'?'Done':r.rec.homework==='not_done'?'Not done':'—'}</td>
+        <td>${r.rec.exam!==null && r.rec.exam!==undefined ? r.rec.exam+'/'+EXAM_MAX : '—'}</td>
+      </tr>`;
+    });
+    html += `</tbody></table></div></div>`;
+    historyContent.innerHTML = html;
+  }
+
+  /* When a month is chosen, also show the whole class ranked highest to
+     lowest for that same month, right here in this tab. */
+  if(monthFilter && scopedDates.length){
+    historyRankingTitle.style.display = 'block';
+    const sorted = computeClassRanking(scopedDates);
+    const withOverall = sorted.filter(s=>s.overall!==null);
+    const maxOverall = withOverall.length ? Math.max(...withOverall.map(s=>s.overall)) : null;
+    historyRankingContent.innerHTML = rankingTableHtml(sorted, maxOverall);
+  } else {
+    historyRankingTitle.style.display = 'none';
+    historyRankingContent.innerHTML = '';
+  }
+}
+historySelect.addEventListener('change', renderHistory);
+historyMonthInput.addEventListener('change', renderHistory);
+
+/* ---------- IMAGE REPORT EXPORT (pure Canvas, no external library) ---------- */
+function monthLabel(monthStr){
+  const [y,m] = monthStr.split('-').map(Number);
+  const dt = new Date(y, m-1, 1);
+  return dt.toLocaleDateString('en-GB', { month:'long', year:'numeric' });
+}
+
+function wrapCanvasText(ctx, text, maxWidth){
+  const words = String(text).split(' ');
+  const lines = [];
+  let line = '';
+  words.forEach(w=>{
+    const test = line ? line + ' ' + w : w;
+    if(ctx.measureText(test).width > maxWidth && line){
+      lines.push(line); line = w;
+    } else { line = test; }
+  });
+  if(line) lines.push(line);
+  return lines;
+}
+
+/* Draws the whole report onto ctx and returns the total height used.
+   Called once with draw=false (measurement pass, on a throwaway 1x1
+   context) and once with draw=true on the correctly-sized real canvas. */
+function paintReport(ctx, W, monthStr, ranking, dateList, draw){
+  const marginX = 30;
+  const logoImg = document.querySelector('header.top img');
+  let y = 24;
+
+  if(draw){
+    ctx.fillStyle = '#FFFCF6';
+    ctx.fillRect(0, 0, W, 999999);
+  }
+
+  try{ if(draw && logoImg && logoImg.complete) ctx.drawImage(logoImg, marginX, y, 56, 47); }catch(e){}
+  ctx.fillStyle = '#2A2620'; ctx.font = 'bold 22px Arial, sans-serif';
+  if(draw) ctx.fillText('Saint Mary Elias Language School', marginX+70, y+24);
+  ctx.fillStyle = '#6B6459'; ctx.font = '14px Arial, sans-serif';
+  if(draw) ctx.fillText('K.G. 2 B  ·  2026/2027', marginX+70, y+46);
+  y += 74;
+
+  if(draw){ ctx.strokeStyle = '#EDE6D8'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(marginX,y); ctx.lineTo(W-marginX,y); ctx.stroke(); }
+  y += 26;
+  ctx.fillStyle = '#2A2620'; ctx.font = 'bold 15px Arial, sans-serif';
+  if(draw) ctx.fillText(`Teacher: ${SETTINGS.teacher}      Subject: ${SETTINGS.subject}      Month: ${monthLabel(monthStr)}`, marginX, y);
+  y += 40;
+
+  /* Class ranking */
+  ctx.fillStyle = '#2A2620'; ctx.font = 'bold 18px Arial, sans-serif';
+  if(draw) ctx.fillText('Class ranking', marginX, y);
+  y += 30;
+
+  const colName=marginX, colAtt=marginX+340, colHw=marginX+430, colExam=marginX+520, colOverall=marginX+610;
+  ctx.font = 'bold 12px Arial, sans-serif'; ctx.fillStyle = '#6B6459';
+  if(draw){
+    ctx.fillText('Name', colName, y);
+    ctx.fillText('Attend.', colAtt, y);
+    ctx.fillText('Homework', colHw, y);
+    ctx.fillText('Exam', colExam, y);
+    ctx.fillText('Overall', colOverall, y);
+    ctx.strokeStyle = '#EDE6D8'; ctx.beginPath(); ctx.moveTo(marginX,y+8); ctx.lineTo(W-marginX,y+8); ctx.stroke();
+  }
+  y += 24;
+
+  ctx.font = '13px Arial, sans-serif';
+  ranking.forEach((s,i)=>{
+    const nameLines = wrapCanvasText(ctx, `${i+1}. ${s.name}`, 320);
+    const rowH = Math.max(20, nameLines.length*18+4);
+    if(draw){
+      ctx.fillStyle = '#2A2620'; ctx.font = '13px Arial, sans-serif';
+      nameLines.forEach((ln,li)=> ctx.fillText(ln, colName, y+li*18));
+      ctx.fillText(s.attendancePct!==null ? s.attendancePct+'%' : '—', colAtt, y);
+      ctx.fillText(s.homeworkPct!==null ? s.homeworkPct+'%' : '—', colHw, y);
+      ctx.fillText(s.examAvg!==null ? s.examAvg+'/'+EXAM_MAX : '—', colExam, y);
+      ctx.font = 'bold 13px Arial, sans-serif';
+      ctx.fillText(s.overall!==null ? s.overall+'%' : '—', colOverall, y);
+    }
+    y += rowH;
+  });
+  y += 34;
+
+  /* Day-by-day log */
+  ctx.fillStyle = '#2A2620'; ctx.font = 'bold 18px Arial, sans-serif';
+  if(draw) ctx.fillText('Day-by-day log', marginX, y);
+  y += 30;
+
+  const dColName=marginX, dColAtt=marginX+360, dColHw=marginX+500, dColExam=marginX+620;
+  const datesAsc = [...dateList].sort();
+
+  datesAsc.forEach(d=>{
+    const girlsRec = (DATA.records[d] && DATA.records[d].girls) || {};
+    const entries = GIRLS
+      .map(name => ({name, rec: girlsRec[name]}))
+      .filter(x => x.rec && (x.rec.attendance || x.rec.homework || (x.rec.exam!==null && x.rec.exam!==undefined)));
+    if(entries.length===0) return;
+
+    ctx.fillStyle = '#2E7FD6'; ctx.font = 'bold 14px Arial, sans-serif';
+    if(draw) ctx.fillText(formatDatePretty(d), marginX, y);
+    y += 22;
+
+    ctx.fillStyle = '#6B6459'; ctx.font = 'bold 12px Arial, sans-serif';
+    if(draw){
+      ctx.fillText('Name', dColName, y);
+      ctx.fillText('Attendance', dColAtt, y);
+      ctx.fillText('Homework', dColHw, y);
+      ctx.fillText('Exam', dColExam, y);
+      ctx.strokeStyle = '#EDE6D8'; ctx.beginPath(); ctx.moveTo(marginX,y+8); ctx.lineTo(W-marginX,y+8); ctx.stroke();
+    }
+    y += 22;
+
+    entries.forEach(({name, rec})=>{
+      ctx.font = '13px Arial, sans-serif';
+      const nameLines = wrapCanvasText(ctx, name, 340);
+      const rowH = Math.max(19, nameLines.length*17+3);
+      if(draw){
+        ctx.fillStyle = '#2A2620';
+        nameLines.forEach((ln,li)=> ctx.fillText(ln, dColName, y+li*17));
+        ctx.fillText(rec.attendance==='present'?'Present':rec.attendance==='absent'?'Absent':'—', dColAtt, y);
+        ctx.fillText(rec.homework==='done'?'Done':rec.homework==='not_done'?'Not done':'—', dColHw, y);
+        ctx.fillText(rec.exam!==null && rec.exam!==undefined ? rec.exam+'/'+EXAM_MAX : '— (no exam)', dColExam, y);
+      }
+      y += rowH;
+    });
+    y += 20;
+  });
+
+  y += 20;
+  return y;
+}
+
+async function buildMonthReportImageBlob(monthStr, dateList){
+  const ranking = computeClassRanking(dateList);
+  const W = 900;
+  const scale = 2;
+
+  const measure = document.createElement('canvas');
+  measure.width = 10; measure.height = 10;
+  const mctx = measure.getContext('2d');
+  const totalH = paintReport(mctx, W, monthStr, ranking, dateList, false);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.ceil(W*scale);
+  canvas.height = Math.ceil(totalH*scale);
+  const ctx = canvas.getContext('2d');
+  ctx.scale(scale, scale);
+  ctx.textBaseline = 'alphabetic';
+  paintReport(ctx, W, monthStr, ranking, dateList, true);
+
+  return await new Promise(resolve => canvas.toBlob(blob => resolve(blob), 'image/png'));
+}
+
+document.getElementById('download-report-pdf').addEventListener('click', async ()=>{
+  const monthStr = reportMonthInput.value;
+  if(!monthStr){ showToast('Choose a month first'); return; }
+  const dateList = getMonthDates(monthStr);
+  if(dateList.length===0){ showToast('No records for this month yet'); return; }
+  if(!downloadsApi){ showToast('Sharing an image is not available in this view'); return; }
+
+  showToast('Preparing the report…');
+  try{
+    const blob = await buildMonthReportImageBlob(monthStr, dateList);
+    await downloadsApi.save({ filename: `SME_KG2B_${monthStr}_Report.png`, data: blob });
+    showToast('Saved — you can now share it from your files');
+  }catch(e){
+    if(e && e.code === 'declined'){ /* viewer cancelled, no message needed */ }
+    else { console.error('Image export failed', e); showToast('Could not create the report'); }
+  }
+});
+
+/* ---------- RESET ---------- */
+document.getElementById('reset-all').addEventListener('click', async ()=>{
+  if(!canEdit) return;
+  if(!confirm('This will permanently erase every saved record for the whole class. Continue?')) return;
+  DATA = {records:{}};
+  setDirty(false);
+  await persist();
+  buildDailyRows(dailyDateInput.value || todayStr());
+  renderReport();
+  renderHistory();
+  showToast('All data erased');
+});
+
+/* ---------- INIT ---------- */
+(function init(){
+  const t = todayStr();
+  dailyDateInput.value = t;
+  reportMonthInput.value = t.slice(0,7);
+  DATA = loadLocal();
+  buildDailyRows(t);
+  initPlatform();
+})();
+</script>
+</body>
+</html>
